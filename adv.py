@@ -13,9 +13,9 @@ world = World()
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
-map_file = "maps/test_loop.txt"
+# map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -42,8 +42,8 @@ def find_all_paths():
 
         if current_room_id not in visited:
             visited[current_room_id] = path
-            if len(room_graph[current_room_id][1]) == 1:
-                paths_to_dead_ends.append(path)
+            # if len(room_graph[current_room_id][1]) == 1:
+            #     paths_to_dead_ends.append(path)
 
         for room_id in room_graph[current_room_id][1].values():
             if room_id not in visited:
@@ -54,8 +54,35 @@ def find_all_paths():
     print(visited)
     print(paths_to_dead_ends)
     print(len(visited))
+    return visited
 
-find_all_paths()
+
+def remove_redundant_paths(paths):
+    # Create a list of all paths
+    list_of_paths = []
+    for sublist in paths.values():
+        list_of_paths.append(sublist)
+
+    # Sort list by length descending
+    list_of_paths.sort(key=len, reverse=True)
+
+    copy_list = list_of_paths.copy()
+
+    for i in range(0, len(list_of_paths)):
+        for j in range(i + 1, len(list_of_paths)):
+            if set(list_of_paths[j]).issubset(set(list_of_paths[i])):
+                copy_list[j] = None
+
+    final_list_of_paths = []
+    for l in copy_list:
+        if l is not None:
+            final_list_of_paths.append(l)
+
+    return final_list_of_paths
+
+
+all_paths = find_all_paths()
+remove_redundant_paths(all_paths)
 
 # TRAVERSAL TEST
 visited_rooms = set()
