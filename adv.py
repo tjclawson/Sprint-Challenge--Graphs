@@ -4,6 +4,7 @@ from world import World
 
 import random
 from ast import literal_eval
+from util import Stack, Queue
 
 # Load world
 world = World()
@@ -29,6 +30,30 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 traversal_path = []
 
+visited = set()
+room_list = []
+
+
+def dft_recursive(room_id):
+
+    room_list.append(room_id)
+    if room_id not in visited:
+        visited.add(room_id)
+        for key, id in room_graph[room_id][1].items():
+            if id not in visited:
+                dft_recursive(id)
+                room_list.append(room_id)
+
+
+def convert_list_of_rooms_to_directions(rooms):
+    for i in range(0, len(rooms) - 1):
+        for direction, room_id in room_graph[rooms[i]][1].items():
+            if room_id == rooms[i + 1]:
+                traversal_path.append(direction)
+
+
+dft_recursive(player.current_room.id)
+convert_list_of_rooms_to_directions(room_list)
 
 
 # TRAVERSAL TEST
@@ -50,13 +75,13 @@ else:
 
 #######
 # UNCOMMENT TO WALK AROUND
-#######
-player.current_room.print_room_description(player)
-while True:
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    elif cmds[0] == "q":
-        break
-    else:
-        print("I did not understand that command.")
+# #######
+# player.current_room.print_room_description(player)
+# while True:
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     elif cmds[0] == "q":
+#         break
+#     else:
+#         print("I did not understand that command.")
