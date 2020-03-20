@@ -14,8 +14,8 @@ world = World()
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
-map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+# map_file = "maps/test_loop_fork.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -47,20 +47,14 @@ def dft_recursive(room_id):
 
 def convert_list_of_rooms_to_directions(rooms):
     for i in range(0, len(rooms) - 1):
-        for direction, id in room_graph[rooms[i]][1].items():
-            if id == rooms[i + 1]:
+        for direction, room_id in room_graph[rooms[i]][1].items():
+            if room_id == rooms[i + 1]:
                 traversal_path.append(direction)
 
 
 dft_recursive(player.current_room.id)
 convert_list_of_rooms_to_directions(room_list)
-print(room_list)
 
-testing = []
-for i in range(0, len(traversal_path)):
-    testing.append((room_list[i], traversal_path[i]))
-
-print(testing)
 
 # TRAVERSAL TEST
 visited_rooms = set()
