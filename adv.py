@@ -14,8 +14,8 @@ world = World()
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
-# map_file = "maps/test_loop_fork.txt"
-map_file = "maps/main_maze.txt"
+map_file = "maps/test_loop_fork.txt"
+# map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -30,59 +30,37 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 traversal_path = []
 
-def find_all_paths():
-    visited = {}
-    paths_to_dead_ends = []
-    q = Queue()
-    q.enqueue([player.current_room.id])
-
-    while q.size() > 0:
-        path = q.dequeue()
-        current_room_id = path[-1]
-
-        if current_room_id not in visited:
-            visited[current_room_id] = path
-            # if len(room_graph[current_room_id][1]) == 1:
-            #     paths_to_dead_ends.append(path)
-
-        for room_id in room_graph[current_room_id][1].values():
-            if room_id not in visited:
-                path_copy = path.copy()
-                path_copy.append(room_id)
-                q.enqueue(path_copy)
-
-    print(visited)
-    print(paths_to_dead_ends)
-    print(len(visited))
-    return visited
+visited = set()
+room_list = []
 
 
-def remove_redundant_paths(paths):
-    # Create a list of all paths
-    list_of_paths = []
-    for sublist in paths.values():
-        list_of_paths.append(sublist)
+def dft_recursive(room_id):
 
-    # Sort list by length descending
-    list_of_paths.sort(key=len, reverse=True)
-
-    copy_list = list_of_paths.copy()
-
-    for i in range(0, len(list_of_paths)):
-        for j in range(i + 1, len(list_of_paths)):
-            if set(list_of_paths[j]).issubset(set(list_of_paths[i])):
-                copy_list[j] = None
-
-    final_list_of_paths = []
-    for l in copy_list:
-        if l is not None:
-            final_list_of_paths.append(l)
-
-    return final_list_of_paths
+    room_list.append(room_id)
+    if room_id not in visited:
+        visited.add(room_id)
+        for key, id in room_graph[room_id][1].items():
+            if id not in visited:
+                dft_recursive(id)
+                room_list.append(room_id)
 
 
-all_paths = find_all_paths()
-remove_redundant_paths(all_paths)
+def convert_list_of_rooms_to_directions(rooms):
+    for i in range(0, len(rooms) - 1):
+        for direction, id in room_graph[rooms[i]][1].items():
+            if id == rooms[i + 1]:
+                traversal_path.append(direction)
+
+
+dft_recursive(player.current_room.id)
+convert_list_of_rooms_to_directions(room_list)
+print(room_list)
+
+testing = []
+for i in range(0, len(traversal_path)):
+    testing.append((room_list[i], traversal_path[i]))
+
+print(testing)
 
 # TRAVERSAL TEST
 visited_rooms = set()
